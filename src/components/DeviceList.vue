@@ -1,14 +1,12 @@
 <template>
-  <el-container id="Device">
-    <el-aside>
+    <div id="Device">
       <el-card v-for="i in 10" :key="i">
         <div slot="header">
           <span>aaaa</span>
         </div>
         {{i}}
       </el-card>
-    </el-aside>
-  </el-container>
+    </div>
 </template>
 
 <script>
@@ -22,7 +20,8 @@ export default {
 /*  width: 20%;*/
 /*}*/
   #Device{
-    height: 80%;
-    overflow: scroll;
+    height: 70%;
+    width: 20%;
+    overflow: auto;
   }
 </style>

@@ -1,14 +1,12 @@
 <template>
-  <el-container>
-    <el-footer id="House">
+    <div id="House">
       <el-card v-for="i in 10" :key="i">
         <div slot="header">
           <span>aaaa</span>
         </div>
         {{i}}
       </el-card>
-    </el-footer>
-  </el-container>
+    </div>
 </template>
 
 <script>
@@ -20,7 +18,9 @@ export default {
 <style scoped>
   #House{
     /*position: absolute;*/
-    height: 500px;
-    overflow: scroll;
+    height: 20%;
+    width: 100%;
+    overflow: auto;
+    float: bottom;
   }
 </style>
