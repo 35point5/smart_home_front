@@ -1,28 +1,42 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <HomeNavi/>
+    <DeviceList/>
+    <HouseList/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import HomeNavi from './components/HomeNavi'
+import DeviceList from "@/components/DeviceList";
+import HouseList from "@/components/HouseList";
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
+import Vue from 'vue'
+Vue.use(ElementUI)
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    HomeNavi,
+    DeviceList,
+    HouseList
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  height: 100%;
+  width: 100%;
+  position: absolute;
 }
+/*HouseList{*/
+/*  height: 20%;*/
+/*  position: absolute;*/
+/*}*/
+/*HomeNavi{*/
+/*  height: 20%;*/
+/*  position: absolute;*/
+/*}*/
+
 </style>
