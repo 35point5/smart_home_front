@@ -4,7 +4,7 @@
       <span id="welcome">欢迎使用智能家居管理系统</span>
     </el-row>
     <el-row id="main" type="flex" justify="space-between">
-      <el-col id="Device"  >
+      <el-col id="Device">
         <el-card :body-style="{ padding: '0px', width: '100%', position: 'relative'}">
           <span class="DeviceName">灯泡1</span>
           <img src="../static/images/device1.jpg" style="width: 80%; margin: 10%" alt="load failed"/>
@@ -29,23 +29,9 @@
         </el-card>
       </el-col>
       <el-col id="Layout">
-        <div style="height: 100%; width: 100%">
-          <img src="../static/images/house1.png" alt="load failed" style="height: 99%; margin: 0 auto; display: block"  ref="Canvas">
-          <vue-drag-zoom
-              :area-node="node"
-              allow-zoom
-              :range="0.2"
-              :max-zoom="10"
-              :min-zoom="0.2"
-              :left="0"
-              :top="0"
-          >
-<!--          <VueDragResize :isActive="true">-->
-            <img src="../static/images/device1.jpg" class="drag-zoom-content"
-                 alt="load failed"/>
-<!--          </VueDragResize>-->
-          </vue-drag-zoom>
-          </div>
+        <div style="height: 100%; position: relative">
+          <HouseLayout/>
+        </div>
       </el-col>
       <el-col id="Message">
         <el-card>
@@ -109,8 +95,9 @@
 
 <script>
 import ElementUI from 'element-ui';
-import VueDragZoom from 'vue-drag-zoom';
+// import VueDragZoom from 'vue-drag-zoom';
 // import VueDragResize from 'vue-drag-resize'
+import HouseLayout from "@/components/HouseLayout";
 import 'element-ui/lib/theme-chalk/index.css';
 import Vue from 'vue'
 
@@ -118,12 +105,11 @@ Vue.use(ElementUI)
 export default {
   name: 'App',
   components: {
-    VueDragZoom,
-    // VueDragResize
+    HouseLayout,
+    // VueDragZoom
   },
   data() {
     return {
-      node: null,
       deviceList: [
         {
           switch: true,
@@ -131,14 +117,6 @@ export default {
         }
       ]
     }
-  },
-  mounted() {
-    this.$nextTick(
-        function (){
-
-          this.node = this.$refs['Canvas']
-        }
-    )
   }
 }
 </script>
