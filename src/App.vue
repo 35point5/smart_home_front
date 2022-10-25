@@ -4,15 +4,17 @@
       <span id="welcome">欢迎使用智能家居管理系统</span>
     </el-row>
     <el-row id="main" type="flex" justify="space-between">
-      <el-col id="Device">
+      <el-col id="Device"  >
         <el-card :body-style="{ padding: '0px', width: '100%', position: 'relative'}">
           <span class="DeviceName">灯泡1</span>
           <img src="../static/images/device1.jpg" style="width: 80%; margin: 10%" alt="load failed"/>
           <el-row type="flex" justify="center" class="DeviceEntity">
-            <el-switch active-color="#13ce66" inactive-color="#ff4949" active-text="开" inactive-text="关" width="40"/>
+            <el-switch v-model="deviceList[0].switch" active-color="#13ce66" inactive-color="#ff4949" active-text="开"
+                       inactive-text="关"
+                       width="40"/>
           </el-row>
           <el-row class="DeviceEntity">
-            <el-slider style="margin-left: 10px;margin-right: 10px"/>
+            <el-slider v-model="deviceList[0].slider" style="margin-left: 10px;margin-right: 10px"/>
           </el-row>
         </el-card>
         <el-card :body-style="{ padding: '0px', width: '100%', position: 'relative'}">
@@ -26,7 +28,66 @@
           </el-row>
         </el-card>
       </el-col>
+      <el-col id="Layout">
+        <div style="height: 100%; width: 100%">
+          <img src="../static/images/house1.png" alt="load failed" style="height: 99%; margin: 0 auto; display: block"  ref="Canvas">
+          <vue-drag-zoom
+              :area-node="node"
+              allow-zoom
+              :range="0.2"
+              :max-zoom="10"
+              :min-zoom="0.2"
+              :left="0"
+              :top="0"
+          >
+<!--          <VueDragResize :isActive="true">-->
+            <img src="../static/images/device1.jpg" class="drag-zoom-content"
+                 alt="load failed"/>
+<!--          </VueDragResize>-->
+          </vue-drag-zoom>
+          </div>
+      </el-col>
       <el-col id="Message">
+        <el-card>
+          <div slot="header">
+            <span>传感器1</span>
+          </div>
+          2020-10-23 15:40：
+          <el-row>温度变为25℃</el-row>
+          <el-row>湿度变为60%</el-row>
+        </el-card>
+        <el-card>
+          <div slot="header">
+            <span>灯泡1</span>
+          </div>
+          2020-10-23 15:20：
+          <el-row>开关变为开</el-row>
+          <el-row>亮度变为50%</el-row>
+        </el-card>
+        <el-card>
+          <div slot="header">
+            <span>传感器1</span>
+          </div>
+          2020-10-23 15:40：
+          <el-row>温度变为25℃</el-row>
+          <el-row>湿度变为60%</el-row>
+        </el-card>
+        <el-card>
+          <div slot="header">
+            <span>灯泡1</span>
+          </div>
+          2020-10-23 15:20：
+          <el-row>开关变为开</el-row>
+          <el-row>亮度变为50%</el-row>
+        </el-card>
+        <el-card>
+          <div slot="header">
+            <span>传感器1</span>
+          </div>
+          2020-10-23 15:40：
+          <el-row>温度变为25℃</el-row>
+          <el-row>湿度变为60%</el-row>
+        </el-card>
         <el-card>
           <div slot="header">
             <span>灯泡1</span>
@@ -48,13 +109,37 @@
 
 <script>
 import ElementUI from 'element-ui';
+import VueDragZoom from 'vue-drag-zoom';
+// import VueDragResize from 'vue-drag-resize'
 import 'element-ui/lib/theme-chalk/index.css';
 import Vue from 'vue'
 
 Vue.use(ElementUI)
 export default {
   name: 'App',
-  components: {}
+  components: {
+    VueDragZoom,
+    // VueDragResize
+  },
+  data() {
+    return {
+      node: null,
+      deviceList: [
+        {
+          switch: true,
+          slider: 50
+        }
+      ]
+    }
+  },
+  mounted() {
+    this.$nextTick(
+        function (){
+
+          this.node = this.$refs['Canvas']
+        }
+    )
+  }
 }
 </script>
 
@@ -75,7 +160,7 @@ export default {
 
 #Device {
   /*height: 70%;*/
-  width: 12%;
+  width: 15%;
   overflow: auto;
 }
 
@@ -92,6 +177,10 @@ export default {
 
 .DeviceEntity {
   margin-top: 10%;
+}
+
+#Layout {
+  margin: 3vh 0;
 }
 
 #Message {

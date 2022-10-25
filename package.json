@@ -10,7 +10,9 @@
   "dependencies": {
     "core-js": "^3.8.3",
     "element-ui": "^2.15.10",
-    "vue": "^2.6.14"
+    "vue": "^2.6.14",
+    "vue-drag-resize": "^1.5.4",
+    "vue-drag-zoom": "^1.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
