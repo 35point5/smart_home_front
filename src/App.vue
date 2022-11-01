@@ -30,7 +30,36 @@
       </el-col>
       <el-col id="Layout">
         <div style="height: 100%; position: relative">
-          <HouseLayout/>
+          <div style="height: 100%;">
+            <img src="../static/images/house1.png" alt="load failed" style="height: 100%; width: 100%;" ref="Canvas">
+            <!--    position: absolute; top: 0; left: 100px; width: 100px; height: 100px-->
+            <vue-drag-zoom
+                :area-node="node"
+                allow-zoom
+                :range="0.2"
+                :max-zoom="10"
+                :min-zoom="0.2"
+            >
+              <!--          <VueDragResize :isActive="true">-->
+              <span class="DeviceName">灯泡1</span>
+              <img src="../static/images/device1.jpg" class="drag-zoom-content"
+                   alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh">
+              <!--          </VueDragResize>-->
+            </vue-drag-zoom>
+            <vue-drag-zoom
+                :area-node="node"
+                allow-zoom
+                :range="0.2"
+                :max-zoom="10"
+                :min-zoom="0.2"
+            >
+              <!--          <VueDragResize :isActive="true">-->
+              <span class="DeviceName">传感器1</span>
+              <img src="../static/images/device2.jpg" class="drag-zoom-content"
+                   alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh">
+              <!--          </VueDragResize>-->
+            </vue-drag-zoom>
+          </div>
         </div>
       </el-col>
       <el-col id="Message">
@@ -95,9 +124,9 @@
 
 <script>
 import ElementUI from 'element-ui';
-// import VueDragZoom from 'vue-drag-zoom';
+import VueDragZoom from 'vue-drag-zoom';
 // import VueDragResize from 'vue-drag-resize'
-import HouseLayout from "@/components/HouseLayout";
+// import HouseLayout from "@/components/HouseLayout";
 import 'element-ui/lib/theme-chalk/index.css';
 import Vue from 'vue'
 
@@ -105,11 +134,12 @@ Vue.use(ElementUI)
 export default {
   name: 'App',
   components: {
-    HouseLayout,
-    // VueDragZoom
+    // HouseLayout,
+    VueDragZoom
   },
   data() {
     return {
+      node:null,
       deviceList: [
         {
           switch: true,
@@ -117,6 +147,9 @@ export default {
         }
       ]
     }
+  },
+  mounted() {
+    this.node = this.$refs['Canvas']
   }
 }
 </script>
