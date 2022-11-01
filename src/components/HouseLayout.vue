@@ -12,6 +12,19 @@
       <!--          <VueDragResize :isActive="true">-->
       <span class="DeviceName">灯泡1</span>
       <img src="../../static/images/device1.jpg" class="drag-zoom-content"
+           alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh">
+      <!--          </VueDragResize>-->
+    </vue-drag-zoom>
+    <vue-drag-zoom
+        :area-node="node"
+        allow-zoom
+        :range="0.2"
+        :max-zoom="10"
+        :min-zoom="0.2"
+    >
+      <!--          <VueDragResize :isActive="true">-->
+      <span class="DeviceName">传感器1</span>
+      <img src="../../static/images/device2.jpg" class="drag-zoom-content"
            alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh">
       <!--          </VueDragResize>-->
     </vue-drag-zoom>
@@ -46,7 +59,7 @@ export default {
   padding: .5%;
   border-radius: 2px;
   font-family: "PingFang SC", sans-serif;
-  font-size: 10vh;
+  font-size: 5vh;
   opacity: .8;
 }
 </style>

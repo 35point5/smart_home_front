@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <el-row id="Home" type="flex" justify="center" align="middle">
-      <span id="welcome">欢迎使用智能家居管理系统</span>
+      <span id="welcome">Mogician，欢迎使用智能家居管理系统</span>
     </el-row>
     <el-row id="main" type="flex" justify="space-between">
       <el-col id="Device">
