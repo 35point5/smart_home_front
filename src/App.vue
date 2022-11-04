@@ -1,5 +1,17 @@
 <template>
   <div id="app">
+    <el-dialog
+        title="请先登录或注册"
+        :visible.sync="dialogVisible"
+        width="30%">
+      <el-input placeholder="请输入用户名" class="Input"></el-input>
+      <el-input placeholder="请输入密码" class="Input"></el-input>
+      <el-input placeholder="请输入手机号" class="Input"></el-input>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">登 录</el-button>
+        <el-button type="primary" @click="dialogVisible = false">注 册</el-button>
+      </span>
+    </el-dialog>
     <el-row id="Home" type="flex" justify="center" align="middle">
       <span id="welcome">Mogician，欢迎使用智能家居管理系统</span>
     </el-row>
@@ -43,7 +55,8 @@
               <!--          <VueDragResize :isActive="true">-->
               <span class="DeviceName">灯泡1</span>
               <img src="../static/images/device1.jpg" class="drag-zoom-content"
-                   alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh">
+                   alt="load failed"
+                   style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh">
               <!--          </VueDragResize>-->
             </vue-drag-zoom>
             <vue-drag-zoom
@@ -139,7 +152,8 @@ export default {
   },
   data() {
     return {
-      node:null,
+      node: null,
+      dialogVisible:true,
       deviceList: [
         {
           switch: true,
@@ -162,6 +176,11 @@ export default {
   /*overflow: hidden;*/
   /*background: black;*/
   /*display: flex;*/
+}
+
+.Input{
+  margin: 5px;
+  /*width: 90%;*/
 }
 
 #main {
