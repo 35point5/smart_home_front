@@ -27,6 +27,7 @@
           multiple
           :before-upload="uploadHouseImg">
         <i class="el-icon-upload"></i>
+        <div class="el-upload__text">上传场所图</div>
       </el-upload>
       <img v-else :src="uploadHouse['Img']" style="width: 100%">
       <span slot="footer" class="dialog-footer">
@@ -55,6 +56,7 @@
           multiple
           :before-upload="uploadDeviceImg">
         <i class="el-icon-upload"></i>
+        <div class="el-upload__text">上传设备图</div>
       </el-upload>
       <img v-else :src="uploadDevice['Img']" style="width: 100%">
       <span slot="footer" class="dialog-footer">
@@ -77,24 +79,11 @@
                        :width="40"/>
             <el-slider v-else-if="e.Type===1" :format-tooltip="sliderInfo" v-model="e.Value"
                        style="margin-left: 10px;margin-right: 10px"/>
-            <span v-else-if="e.Type===2">{{j}}：{{e.Value}}</span>
-          </el-row>
-          <!--          <el-row class="DeviceEntity">-->
-          <!--            <el-slider v-model="deviceInfo[0].slider" style="margin-left: 10px;margin-right: 10px"/>-->
-          <!--          </el-row>-->
-        </el-card>
-        <el-card :body-style="{ padding: '0px', width: '100%', position: 'relative'}">
-          <span class="DeviceName">传感器1</span>
-          <img src="../static/images/device2.jpg" style="width: 80%; margin: 10%" alt="load failed"/>
-          <el-row type="flex" justify="center" class="DeviceEntity">
-            <span>温度：25℃</span>
-          </el-row>
-          <el-row type="flex" justify="center" class="DeviceEntity">
-            <span>湿度：60%</span>
+            <span v-else-if="e.Type===2">{{ j }}：{{ e.Value }}</span>
           </el-row>
         </el-card>
         <el-card
-            v-if="CurrentHouse!=null"
+            v-if="CurrentHouseID!=null"
             :body-style="{ padding: '0px', width: '100px', position: 'relative', width: '100%', border: '2px dashed #d9d9d9','box-sizing': 'border-box'}"
             class="HouseCard">
           <div @click="showUploadDevice" class="HouseAdd">
@@ -103,37 +92,33 @@
           </div>
         </el-card>
       </el-col>
-      <el-col id="Layout">
+      <el-col id="Layout" style="margin: 0">
         <div style="height: 100%; position: relative">
           <div style="height: 100%;" ref="Canvas">
-            <img src="../static/images/house1.png" alt="load failed" style="height: 100%; width: 100%;">
-            <!--    position: absolute; top: 0; left: 100px; width: 100px; height: 100px-->
+            <img v-if="CurrentHouseIndex!=null" :src="houseInfo[CurrentHouseIndex].Img" alt="load failed"
+                 style="height: 100%; width: 100%;">
+            <el-button type="primary" style="position: absolute; left: 100%; transform: translate(-100%,0)"
+                       @click="saveLayout">保存布局
+            </el-button>
             <vue-drag-zoom
+                v-for="(o, i) in deviceInfo"
+                :key="i"
                 :area-node="node"
                 allow-zoom
                 :range="0.2"
                 :max-zoom="10"
                 :min-zoom="0.2"
+                :left="o.PosX*node.offsetWidth"
+                :top="o.PosY*node.offsetHeight"
+                :zoom="o.Zoom"
+                :width="200"
+                @mousemove="move($event,i)"
+                @mousescroll="zoom($event,i)"
             >
-              <!--          <VueDragResize :isActive="true">-->
-              <span class="DeviceName">灯泡1</span>
-              <img src="../static/images/device1.jpg" class="drag-zoom-content"
+              <span class="DeviceName">{{ o.Name }}</span>
+              <img :src="o.Img" class="drag-zoom-content"
                    alt="load failed"
-                   style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh">
-              <!--          </VueDragResize>-->
-            </vue-drag-zoom>
-            <vue-drag-zoom
-                :area-node="node"
-                allow-zoom
-                :range="0.2"
-                :max-zoom="10"
-                :min-zoom="0.2"
-            >
-              <!--          <VueDragResize :isActive="true">-->
-              <span class="DeviceName">传感器1</span>
-              <img src="../static/images/device2.jpg" class="drag-zoom-content"
-                   alt="load failed" style="border-color: darkblue; border-style: solid; border-width: 2vh">
-              <!--          </VueDragResize>-->
+                   style="border-color: darkblue; border-style: solid; border-width: 2vh; width: 20vh; box-sizing: border-box">
             </vue-drag-zoom>
           </div>
         </div>
@@ -168,7 +153,7 @@
     <el-row id="House" type="flex">
       <el-card :body-style="{ padding: '0px', height: '100%'}" v-for="(o, i) in houseInfo" :key="i" class="HouseCard">
         <span class="HouseName">{{ o.Name }}</span>
-        <img @click="changeHouse(o)" :src="o.Img" style="height: 100%;" alt="load failed"/>
+        <img @click="changeHouse(o, i)" :src="o.Img" style="height: 100%;" alt="load failed"/>
       </el-card>
 
       <el-card
@@ -185,7 +170,7 @@
 
 <script>
 import ElementUI from 'element-ui';
-import VueDragZoom from 'vue-drag-zoom';
+import VueDragZoom from './components/DragZoom';
 // import VueDragResize from 'vue-drag-resize'
 // import HouseLayout from "@/components/HouseLayout";
 import 'element-ui/lib/theme-chalk/index.css';
@@ -200,9 +185,9 @@ export default {
     VueDragZoom
   },
   computed: {
-    // DeviceStatus(){
-    //   return this.deviceInfo.map((o)=>{
-    //     return JSON.parse(o.Status)
+    // devicePos() {
+    //   return this.deviceInfo.map((o) => {
+    //     return [o.Posx*this.node.offsetWidth]
     //   })
     // }
   },
@@ -214,7 +199,8 @@ export default {
       UploadHouseImgVisible: true,
       AddDeviceVisible: false,
       UploadDeviceImgVisible: true,
-      CurrentHouse: null,
+      CurrentHouseID: null,
+      CurrentHouseIndex: null,
       DeviceTypes: ['灯', '开关', '传感器', '门'],
       uploadHouse: {
         Name: '',
@@ -332,18 +318,22 @@ export default {
     getHouse() {
       axios.post('/smart_home/api/site/getHouse').then((resp) => {
         this.houseInfo = resp.data
+        if (this.houseInfo != null && this.houseInfo.length > 0) {
+          this.changeHouse(this.houseInfo[0], 0)
+        }
         console.log(this.houseInfo)
       }).catch((err) => {
         this.$message.error(err.response.data['message']);
       })
     },
     showUploadDevice() {
-      this.uploadDevice.Sid = this.CurrentHouse
+      this.uploadDevice.Sid = this.CurrentHouseID
       this.AddDeviceVisible = true;
       this.UploadDeviceImgVisible = true;
     },
-    changeHouse(h) {
-      this.CurrentHouse = h.ID
+    changeHouse(h, i) {
+      this.CurrentHouseID = h.ID
+      this.CurrentHouseIndex = i
       axios.post('/smart_home/api/device/getDevice', h).then((resp) => {
         if (resp.data != null) {
           this.deviceInfo = resp.data
@@ -356,6 +346,39 @@ export default {
     },
     sliderInfo(v) {
       return '亮度：' + v.toString() + '%'
+    },
+    move(e, i) {
+      let w = this.node.offsetWidth, h = this.node.offsetHeight, l = e[3], t = e[4], z = e[5];
+      console.log(w, h, l, t, z)
+      this.deviceInfo[i].PosX = (l) / w
+      this.deviceInfo[i].PosY = (t) / h
+      this.deviceInfo[i].Zoom = z
+      console.log(this.deviceInfo[i].PosX, this.deviceInfo[i].PosY, this.deviceInfo[i].Zoom)
+    },
+    zoom(e, i) {
+      let w = this.node.offsetWidth, h = this.node.offsetHeight, l = e[3], t = e[4], z = e[5];
+      console.log(w, h, l, t, z)
+      this.deviceInfo[i].PosX = l / w
+      this.deviceInfo[i].PosY = t / h
+      this.deviceInfo[i].Zoom = z
+      console.log(this.deviceInfo[i].PosX, this.deviceInfo[i].PosY, this.deviceInfo[i].Zoom)
+    },
+    saveLayout() {
+      if (this.deviceInfo == null) return
+      let temp = JSON.parse(JSON.stringify(this.deviceInfo))
+      temp.forEach((o) => {
+        o.Status = JSON.stringify(o.Status)
+        return o
+      })
+      axios.post('/smart_home/api/device/saveLayout', temp).then(() => {
+        this.$message({
+          message: '保存成功',
+          type: 'success'
+        });
+      }).catch((err) => {
+        console.log(err.status)
+        this.$message.error(err.response.data['message']);
+      })
     }
   }
 }
