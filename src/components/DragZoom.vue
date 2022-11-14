@@ -230,7 +230,7 @@ export default {
         this.dragZoomNode.style.left = styleL + 'px';
         this.dragZoomNode.style.top = styleT + 'px';
 
-        this.$emit('mousemove', [evt, this.areaWidth, this.areaHeight, this.dragZoomNode.offsetLeft, this.dragZoomNode.offsetTop, this.currentZoom]);
+        this.$emit('mousemove', [evt, this.width, this.height, this.dragZoomNode.offsetLeft, this.dragZoomNode.offsetTop, this.currentZoom]);
       };
       document.onmouseup = () => {
         document.onmousemove = null;
@@ -332,7 +332,7 @@ export default {
       //   }
       // }
 
-      this.$emit('mousescroll', [evt, this.areaWidth, this.areaHeight, this.dragZoomNode.offsetLeft, this.dragZoomNode.offsetTop, this.currentZoom]);
+      this.$emit('mousescroll', [evt, this.width, this.height, this.dragZoomNode.offsetLeft, this.dragZoomNode.offsetTop, this.currentZoom]);
     },
 
     // 样式初始化

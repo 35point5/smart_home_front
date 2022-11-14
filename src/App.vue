@@ -63,19 +63,27 @@
         <el-button type="primary" @click="addDevice">添 加</el-button>
       </span>
     </el-dialog>
-    <el-row id="Home" type="flex" justify="center" align="middle">
+    <el-row id="Home" style="text-align: center" type="flex" justify="center" align="middle">
       <span id="welcome">{{ usrInfo.Name }}，欢迎使用智能家居管理系统</span>
+      <div style="position: absolute; left: 0;">
+        <el-link :underline="false" class="naviLink" icon="el-icon-check" @click="saveLayout">保存配置</el-link>
+        <el-link :underline="false" class="naviLink" icon="el-icon-key" @click="GetAPIKey">生成API key</el-link>
+      </div>
     </el-row>
     <el-row id="main" type="flex" justify="space-between">
       <el-col id="Device">
+        <div class="subtitle">设备列表</div>
         <el-card v-for="(o, i) in deviceInfo" :key="i"
                  :body-style="{ padding: '0px', width: '100%', position: 'relative'}">
+          <el-button type="danger" icon="el-icon-delete" style="float: right;" size="mini" @click="DeleteDevice(i)"></el-button>
           <span class="DeviceName">{{ o.Name }}</span>
           <img :src="o.Img" style="width: 80%; margin: 10%" alt="load failed"/>
           <el-row v-for="(e,j) in o.Status" :key="j" class="DeviceEntity">
             <el-switch v-if="e.Type===0" v-model="e.Value" active-color="#13ce66" inactive-color="#ff4949"
                        active-text="开"
                        inactive-text="关"
+                       active-value="开"
+                       inactive-value="关"
                        :width="40"/>
             <el-slider v-else-if="e.Type===1" :format-tooltip="sliderInfo" v-model="e.Value"
                        style="margin-left: 10px;margin-right: 10px"/>
@@ -97,9 +105,9 @@
           <div style="height: 100%;" ref="Canvas">
             <img v-if="CurrentHouseIndex!=null" :src="houseInfo[CurrentHouseIndex].Img" alt="load failed"
                  style="height: 100%; width: 100%;">
-            <el-button type="primary" style="position: absolute; left: 100%; transform: translate(-100%,0)"
-                       @click="saveLayout">保存布局
-            </el-button>
+<!--            <el-button type="primary" style="position: absolute; left: 100%; transform: translate(-100%,0)"-->
+<!--                       @click="saveLayout">保存设置-->
+<!--            </el-button>-->
             <vue-drag-zoom
                 v-for="(o, i) in deviceInfo"
                 :key="i"
@@ -108,7 +116,7 @@
                 :range="0.2"
                 :max-zoom="10"
                 :min-zoom="0.2"
-                :left="o.PosX*node.offsetWidth"
+                :left="o.PosX*node.offsetWidth-100*(1-o.Zoom)"
                 :top="o.PosY*node.offsetHeight"
                 :zoom="o.Zoom"
                 :width="200"
@@ -124,35 +132,21 @@
         </div>
       </el-col>
       <el-col id="Message">
-        <el-card>
+        <div class="subtitle">日志消息  <el-link icon="el-icon-refresh" style="font-size: 4vh;float: right" :underline="false" @click="getLog(houseInfo[CurrentHouseIndex])"></el-link></div>
+        <el-card v-for="(o,i) in logInfo" :key="i" style="width: 100%">
           <div slot="header">
-            <span>传感器1</span>
+            <span>{{o.Name}}</span>
+            <el-button type="danger" icon="el-icon-delete" style="float: right;" size="mini" @click="DeleteLog(i)"></el-button>
           </div>
-          2020-10-23 15:40：
-          <el-row>温度变为25℃</el-row>
-          <el-row>湿度变为60%</el-row>
-        </el-card>
-        <el-card>
-          <div slot="header">
-            <span>灯泡1</span>
-          </div>
-          2020-10-23 15:20：
-          <el-row>开关变为开</el-row>
-          <el-row>亮度变为50%</el-row>
-        </el-card>
-        <el-card>
-          <div slot="header">
-            <span>传感器1</span>
-          </div>
-          2020-10-23 15:40：
-          <el-row>温度变为25℃</el-row>
-          <el-row>湿度变为60%</el-row>
+          {{o.Time}}：
+          <el-row v-for="(s,j) in o.Info" :key="j">{{s}}</el-row>
         </el-card>
       </el-col>
     </el-row>
     <el-row id="House" type="flex">
       <el-card :body-style="{ padding: '0px', height: '100%'}" v-for="(o, i) in houseInfo" :key="i" class="HouseCard">
         <span class="HouseName">{{ o.Name }}</span>
+        <el-button type="danger" icon="el-icon-delete" style="float: right;" size="mini" @click="DeleteHouse(i)"></el-button>
         <img @click="changeHouse(o, i)" :src="o.Img" style="height: 100%;" alt="load failed"/>
       </el-card>
 
@@ -218,7 +212,8 @@ export default {
         Phone: ''
       },
       houseInfo: [],
-      deviceInfo: []
+      deviceInfo: [],
+      logInfo:[]
     }
   },
   mounted() {
@@ -334,9 +329,30 @@ export default {
     changeHouse(h, i) {
       this.CurrentHouseID = h.ID
       this.CurrentHouseIndex = i
+      this.getDevice(h)
+      this.getLog(h)
+    },
+    getLog(h){
+      axios.post('/smart_home/api/log/getLog',h).then((resp) => {
+        this.logInfo = resp.data
+        console.log("log:"+this.logInfo)
+      }).catch((err) => {
+        this.$message.error(err.response.data['message']);
+      })
+    },
+    getDevice(h){
       axios.post('/smart_home/api/device/getDevice', h).then((resp) => {
         if (resp.data != null) {
           this.deviceInfo = resp.data
+          this.deviceInfo.forEach((o) => {
+            for (let i in o.Status){
+              if (o.Status[i].Type===1){
+                console.log(o.Status[i])
+                o.Status[i].Value=Number(o.Status[i].Value)
+              }
+            }
+            return o
+          })
         } else {
           this.deviceInfo = []
         }
@@ -350,7 +366,7 @@ export default {
     move(e, i) {
       let w = this.node.offsetWidth, h = this.node.offsetHeight, l = e[3], t = e[4], z = e[5];
       console.log(w, h, l, t, z)
-      this.deviceInfo[i].PosX = (l) / w
+      this.deviceInfo[i].PosX = (l + 100 * (1 - z)) / w
       this.deviceInfo[i].PosY = (t) / h
       this.deviceInfo[i].Zoom = z
       console.log(this.deviceInfo[i].PosX, this.deviceInfo[i].PosY, this.deviceInfo[i].Zoom)
@@ -358,7 +374,7 @@ export default {
     zoom(e, i) {
       let w = this.node.offsetWidth, h = this.node.offsetHeight, l = e[3], t = e[4], z = e[5];
       console.log(w, h, l, t, z)
-      this.deviceInfo[i].PosX = l / w
+      this.deviceInfo[i].PosX = (l + 100 * (1 - z)) / w
       this.deviceInfo[i].PosY = t / h
       this.deviceInfo[i].Zoom = z
       console.log(this.deviceInfo[i].PosX, this.deviceInfo[i].PosY, this.deviceInfo[i].Zoom)
@@ -367,6 +383,10 @@ export default {
       if (this.deviceInfo == null) return
       let temp = JSON.parse(JSON.stringify(this.deviceInfo))
       temp.forEach((o) => {
+        for (let i in o.Status){
+          console.log(o.Status[i].Value)
+          o.Status[i].Value=o.Status[i].Value.toString()
+        }
         o.Status = JSON.stringify(o.Status)
         return o
       })
@@ -377,6 +397,57 @@ export default {
         });
       }).catch((err) => {
         console.log(err.status)
+        this.$message.error(err.response.data['message']);
+      })
+    },
+    GetAPIKey(){
+      axios.post('/smart_home/api/user/getAPIKey', this.usrInfo).then((resp) => {
+        this.$copyText(resp.data.Key)
+        this.$message({
+          message: '已复制到剪贴板，请妥善保存！',
+          type: 'success'
+        });
+      }).catch((err) => {
+        console.log(err.status)
+        this.$message.error(err.response.data['message']);
+      })
+    },
+    DeleteLog(i){
+      axios.post('/smart_home/api/log/deleteLog',this.logInfo[i]).then(() => {
+        this.getLog(this.houseInfo[this.CurrentHouseIndex])
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+      }).catch((err) => {
+        this.$message.error(err.response.data['message']);
+      })
+    },
+    DeleteDevice(i){
+      let temp = JSON.parse(JSON.stringify(this.deviceInfo[i]))
+      temp.Status=null
+      axios.post('/smart_home/api/device/deleteDevice',temp).then(() => {
+        this.getDevice(this.houseInfo[this.CurrentHouseIndex])
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+      }).catch((err) => {
+        this.$message.error(err.response.data['message']);
+      })
+    },
+    DeleteHouse(i){
+      if (i === this.CurrentHouseIndex){
+        this.$message.error("不能删除当前场所！");
+        return
+      }
+      axios.post('/smart_home/api/site/deleteHouse',this.houseInfo[i]).then(() => {
+        this.getHouse()
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        });
+      }).catch((err) => {
         this.$message.error(err.response.data['message']);
       })
     }
@@ -448,6 +519,18 @@ export default {
 #welcome {
   font-size: 4vh;
   font-family: "PingFang SC", sans-serif;
+}
+
+.subtitle{
+  font-size: 3vh;
+  background: #e1e1e1;
+  font-family: "Hiragino Sans GB", sans-serif;
+}
+
+.naviLink {
+  font-size: 3vh;
+  font-family: "Hiragino Sans GB", sans-serif;
+  margin: 5px;
 }
 
 #House {
