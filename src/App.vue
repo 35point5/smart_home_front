@@ -6,7 +6,7 @@
         width="30%"
         :show-close="false">
       <el-input v-model="usrInfo.Name" placeholder="请输入用户名" class="Input"></el-input>
-      <el-input v-model="usrInfo.Password" placeholder="请输入密码" class="Input"></el-input>
+      <el-input v-model="usrInfo.Password" placeholder="请输入密码" class="Input" show-password></el-input>
       <el-input v-model="usrInfo.Phone" placeholder="请输入手机号" class="Input"></el-input>
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="passwordLogin">登 录</el-button>
@@ -69,6 +69,9 @@
         <el-link :underline="false" class="naviLink" icon="el-icon-check" @click="saveLayout">保存配置</el-link>
         <el-link :underline="false" class="naviLink" icon="el-icon-key" @click="GetAPIKey">生成API key</el-link>
       </div>
+      <div style="position: absolute; right: 0;">
+        <el-link :underline="false" class="naviLink" icon="el-icon-d-arrow-left" @click="logout">退出登录</el-link>
+      </div>
     </el-row>
     <el-row id="main" type="flex" justify="space-between">
       <el-col id="Device">
@@ -78,6 +81,9 @@
           <el-button type="danger" icon="el-icon-delete" style="float: right;" size="mini" @click="DeleteDevice(i)"></el-button>
           <span class="DeviceName">{{ o.Name }}</span>
           <img :src="o.Img" style="width: 80%; margin: 10%" alt="load failed"/>
+          <el-row class="DeviceEntity">
+            ID:{{o.ID}}
+          </el-row>
           <el-row v-for="(e,j) in o.Status" :key="j" class="DeviceEntity">
             <el-switch v-if="e.Type===0" v-model="e.Value" active-color="#13ce66" inactive-color="#ff4949"
                        active-text="开"
@@ -395,6 +401,7 @@ export default {
           message: '保存成功',
           type: 'success'
         });
+        this.getLog(this.houseInfo[this.CurrentHouseIndex]);
       }).catch((err) => {
         console.log(err.status)
         this.$message.error(err.response.data['message']);
@@ -450,6 +457,10 @@ export default {
       }).catch((err) => {
         this.$message.error(err.response.data['message']);
       })
+    },
+    logout(){
+      this.$cookies.remove("usr")
+      location.reload()
     }
   }
 }
@@ -488,7 +499,7 @@ export default {
   padding: .5%;
   border-radius: 2px;
   font-family: "PingFang SC", sans-serif;
-  font-size: 3vh;
+  font-size: 4vh;
   opacity: .8;
 }
 
@@ -559,6 +570,7 @@ export default {
   border-radius: 2px;
   font-family: "PingFang SC", sans-serif;
   opacity: .8;
+  font-size: 4vh;
 }
 
 .HouseAdd {
